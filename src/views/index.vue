@@ -16,10 +16,11 @@
 				<el-table-column prop="phone" label="電話"></el-table-column>
 				<el-table-column prop="email" label="電子メール"></el-table-column>
 				<el-table-column prop="bro" label="関連学生"></el-table-column>
-				<el-table-column fixed="right" label="操作" width="120">
+				<el-table-column fixed="right" label="操作" width="180">
 					<template slot-scope="scope">
 						<el-button @click.native.prevent="handleEdit(scope.row)" type="text" size="small">編集</el-button>
 						<el-button @click.native.prevent="handleCheck(scope.row)" type="text" size="small">表示</el-button>
+						<el-button @click.native.prevent="handleDelete(scope.row)" type="text" size="small" style="color: red;">削除</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
@@ -43,7 +44,9 @@
 						<el-option label="女" :value="0"></el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="誕生日"><el-date-picker v-model="form.birth" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker></el-form-item>
+				<el-form-item label="誕生日">
+					<el-date-picker v-model="form.birth" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker>
+				</el-form-item>
 				<el-form-item label="電話"><el-input v-model="form.phone" placeholder="電話に記入してください" class="form-item"></el-input></el-form-item>
 				<el-form-item label="電子メール"><el-input v-model="form.email" placeholder="メールに記入してください。" class="form-item"></el-input></el-form-item>
 				<el-form-item label="関連学生"><el-input v-model="form.bro" placeholder="関連学生を記入してください。" class="form-item"></el-input></el-form-item>
@@ -127,6 +130,26 @@ export default {
 		handleCheck() {
 			this.dialogTitle = '表示';
 			this.dialogVisible = true;
+		},
+		// 删除
+		handleDelete() {
+			this.$confirm('この操作はデータを完全に削除します。続行しますか?', 'ヒント', {
+				confirmButtonText: 'を選択します',
+				cancelButtonText: 'キャンセル',
+				type: 'warning'
+			})
+				.then(() => {
+					this.$message({
+						type: 'success',
+						message: '削除に成功しました!'
+					});
+				})
+				.catch(() => {
+					this.$message({
+						type: 'info',
+						message: '削除しました'
+					});
+				});
 		},
 		// 表格数据初始化
 		initTableData() {
