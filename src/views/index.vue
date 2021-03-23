@@ -14,7 +14,6 @@
 				<el-table-column prop="sex" label="性別"></el-table-column>
 				<el-table-column prop="birth" label="誕生日"></el-table-column>
 				<el-table-column prop="phone" label="電話"></el-table-column>
-				<el-table-column prop="email" label="電子メール"></el-table-column>
 				<el-table-column prop="bro" label="関連学生"></el-table-column>
 				<el-table-column fixed="right" label="操作" width="180">
 					<template slot-scope="scope">
@@ -48,7 +47,6 @@
 					<el-date-picker v-model="form.birth" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker>
 				</el-form-item>
 				<el-form-item label="電話"><el-input v-model="form.phone" placeholder="電話に記入してください" class="form-item"></el-input></el-form-item>
-				<el-form-item label="電子メール"><el-input v-model="form.email" placeholder="メールに記入してください。" class="form-item"></el-input></el-form-item>
 				<el-form-item label="関連学生"><el-input v-model="form.bro" placeholder="関連学生を記入してください。" class="form-item"></el-input></el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -70,7 +68,6 @@ export default {
 				sex: '',
 				birth: '',
 				phone: '',
-				email: '',
 				bro: ''
 			},
 			// 查询日期
