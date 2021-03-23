@@ -13,9 +13,8 @@
 			</div>
 			<div class="jdsms-right-table">
 				<el-table :data="tableData" style="width: 100%" :max-height="tableHeight">
-					<el-table-column prop="date" label="日期" width="140"></el-table-column>
-					<el-table-column prop="name" label="姓名" width="120"></el-table-column>
-					<el-table-column prop="address" label="地址"></el-table-column>
+					<el-table-column prop="name" label="姓名" width="160"></el-table-column>
+					<el-table-column prop="phone" label="联系方式"></el-table-column>
 					<el-table-column fixed="right" label="操作" width="120">
 						<template slot-scope="scope">
 							<el-button @click.native.prevent="handleEdit(scope.row)" type="text" size="small">编辑</el-button>
@@ -35,27 +34,34 @@
 				></el-pagination>
 			</div>
 		</div>
-		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="30%" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false">
+		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="60%" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false">
 			<el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="70px" class="demo-dynamic">
-				<el-form-item
-					prop="email"
-					label="邮箱"
-					:rules="[{ required: true, message: '请输入邮箱地址', trigger: 'blur' }, { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }]"
-				>
-					<el-input v-model="dynamicValidateForm.email" class="form-input"></el-input>
-				</el-form-item>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item prop="name" label="姓名"><el-input v-model="dynamicValidateForm.name" class="form-input"></el-input></el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item prop="phone" label="联系方式"><el-input v-model="dynamicValidateForm.phone" class="form-input"></el-input></el-form-item>
+					</el-col>
+				</el-row>
 				<el-form-item
 					v-for="(domain, index) in dynamicValidateForm.domains"
 					:label="'弟妹' + index"
 					:key="domain.key"
-					:prop="'domains.' + index + '.value'"
+					:prop="'domains.' + index + '.bs'"
 					:rules="{
 						required: true,
 						message: '弟妹信息不能为空',
 						trigger: 'blur'
 					}"
 				>
-					<el-input v-model="domain.value" class="form-input"></el-input>
+					<el-input v-model="domain.bs.name" class="form-input form-input-name" placeholder="请输入弟妹姓名"></el-input>
+					<el-select v-model="domain.bs.sex" class="form-input form-input-sex" placeholder="请选择弟妹性别">
+						<el-option label="男" value="1"></el-option>
+						<el-option label="女" value="0"></el-option>
+					</el-select>
+					<el-date-picker v-model="domain.bs.birth" class="form-input form-input-birth" type="date" placeholder="请选择弟妹生日"></el-date-picker>
+					<el-input v-model="domain.bs.phone" class="form-input form-input-phone" placeholder="请输入弟妹联系方式"></el-input>
 					<el-button @click.prevent="removeDomain(domain)">删除</el-button>
 				</el-form-item>
 				<el-form-item>
@@ -79,16 +85,15 @@ export default {
 	name: 'index',
 	data() {
 		return {
-			// 查询日期
-			date: '',
+			// 查询日期，默认当天
+			date: moment().format('YYYY-MM-DD'),
 			// 表格动态最大高度
 			tableHeight: document.body.clientHeight - 210,
 			// 表格数据
 			tableData: [
 				{
-					date: '2016-05-02',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					name: '安倍晋六',
+					phone: '19031290302'
 				}
 			],
 			// 当前页
@@ -101,10 +106,16 @@ export default {
 			dynamicValidateForm: {
 				domains: [
 					{
-						value: ''
+						bs: {
+							name: '',
+							sex: '',
+							birth: '',
+							phone: ''
+						}
 					}
 				],
-				email: ''
+				name: '',
+				phone: ''
 			}
 		};
 	},
@@ -138,7 +149,12 @@ export default {
 		// 新增一行
 		addDomain() {
 			this.dynamicValidateForm.domains.push({
-				value: '',
+				bs: {
+					name: '',
+					sex: '',
+					birth: '',
+					phone: ''
+				},
 				key: Date.now()
 			});
 		},
@@ -164,19 +180,16 @@ export default {
 		},
 		// 新增
 		handleAdd() {
-			this.$message.info('功能开发中');
 			this.dialogTitle = '新增';
 			this.dialogVisible = true;
 		},
 		// 编辑
 		handleEdit() {
-			this.$message.info('功能开发中');
 			this.dialogTitle = '编辑';
 			this.dialogVisible = true;
 		},
 		// 查看
 		handleCheck() {
-			this.$message.info('功能开发中');
 			this.dialogTitle = '查看';
 			this.dialogVisible = true;
 		},
@@ -184,9 +197,8 @@ export default {
 		initTableData() {
 			if (this.tableData.length < 100) {
 				this.tableData.push({
-					date: '2021-03-23',
-					name: '王小虎' + (this.tableData.length + 1),
-					address: '上海市普陀区金沙江路 1518 弄'
+					name: '安倍晋六',
+					phone: '19031290302'
 				});
 				this.initTableData();
 			}
@@ -277,11 +289,11 @@ export default {
 	justify-content: flex;
 	.ban-user-select();
 	.jdsms-left {
-		width: 65%;
+		width: 70%;
 		height: 100%;
 	}
 	.jdsms-right {
-		width: 35%;
+		width: 30%;
 		height: 100%;
 		.jdsms-right-btnbox {
 			padding: 40px 70px 30px 0;
@@ -302,9 +314,21 @@ export default {
 			}
 		}
 	}
-	.form-input{
-		width: calc(~"100% - 120px");
+	.form-input {
+		width: calc(~'100% - 120px');
 		margin-right: 20px;
+	}
+	.form-input-name {
+		width: 20%;
+	}
+	.form-input-sex {
+		width: 20%;
+	}
+	.form-input-birth {
+		width: 20%;
+	}
+	.form-input-phone {
+		width: 20%;
 	}
 }
 </style>
