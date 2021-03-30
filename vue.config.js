@@ -39,7 +39,8 @@ module.exports = {
 				'@': resolve('src'),
 				'@a': resolve('src/assets'),
 				'@v': resolve('src/views'),
-				'@c': resolve('src/components')
+				'@c': resolve('src/components'),
+				'@api': resolve('src/api')
 			}
 		}
 	},
@@ -56,7 +57,8 @@ module.exports = {
 		open: false,
 		proxy: {
 			[process.env.VUE_APP_BASE_API]: {
-				target: `http://localhost:3000`,
+				// target: `http://localhost:3000`,
+				target: `http://211.149.128.130:3000`,
 				changeOrigin: true,
 				pathRewrite: {
 					['^' + process.env.VUE_APP_BASE_API]: ''
