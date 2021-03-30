@@ -58,6 +58,7 @@
 </template>
 
 <script>
+import { listStudent, getStudent, addStudent, updateStudent, delStudent } from '@api/student.js';
 import moment from 'moment';
 export default {
 	name: 'index',
@@ -86,7 +87,7 @@ export default {
 				}
 			],
 			// 当前页
-			currentPage: '',
+			currentPage: 0,
 			// 是否隐藏弹窗
 			dialogVisible: false,
 			// 弹窗标题
@@ -94,9 +95,15 @@ export default {
 		};
 	},
 	mounted() {
-		this.initTableData();
+		// this.initTableData();
+		this.getList();
 	},
 	methods: {
+		getList(){
+			listStudent().then(res => {
+				
+			})
+		},
 		// 拦截关闭弹窗事件
 		handleClose(done) {
 			done();
