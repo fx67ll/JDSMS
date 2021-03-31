@@ -9,7 +9,8 @@
 			</el-button>
 		</div>
 		<div class="jdsms-right-table">
-			<el-table :data="tableData" style="width: 100%" :max-height="tableHeight">
+			<el-table :data="tableData" style="width: 100%" :max-height="tableHeight" v-loading="loading">
+				<el-table-column type="index" label="番号付け" width="180"></el-table-column>
 				<el-table-column prop="name" label="名前"></el-table-column>
 				<el-table-column prop="sex" label="性別"></el-table-column>
 				<el-table-column prop="birth" label="誕生日"></el-table-column>
@@ -44,14 +45,14 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item label="誕生日">
-					<el-date-picker v-model="form.birth" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker>
+					<el-date-picker v-model="form.birth" value-format="yyyy-MM-DD" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker>
 				</el-form-item>
 				<el-form-item label="電話"><el-input v-model="form.phone" placeholder="電話に記入してください" class="form-item"></el-input></el-form-item>
 				<el-form-item label="関連学生"><el-input v-model="form.bro" placeholder="関連学生を記入してください。" class="form-item"></el-input></el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="dialogVisible = false">キャンセル</el-button>
-				<el-button type="primary" @click="dialogVisible = false">を選択します</el-button>
+				<el-button type="primary" @click="addStudent()">を選択します</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -60,6 +61,7 @@
 <script>
 import { listStudent, getStudent, addStudent, updateStudent, delStudent } from '@api/student.js';
 import moment from 'moment';
+import _ from 'underscore';
 export default {
 	name: 'index',
 	data() {
@@ -76,22 +78,15 @@ export default {
 			// 表格动态最大高度
 			tableHeight: document.body.clientHeight - 210,
 			// 表格数据
-			tableData: [
-				{
-					name: '安倍晋三',
-					sex: '男',
-					birth: '2021-03-23',
-					phone: '18902380987',
-					email: '23456@qq.com',
-					bro: '安倍晋六'
-				}
-			],
+			tableData: [],
 			// 当前页
 			currentPage: 0,
 			// 是否隐藏弹窗
 			dialogVisible: false,
 			// 弹窗标题
-			dialogTitle: 'ダイアログ'
+			dialogTitle: 'ダイアログ',
+			// 列表刷新状态
+			loading: false
 		};
 	},
 	mounted() {
@@ -99,10 +94,25 @@ export default {
 		this.getList();
 	},
 	methods: {
-		getList(){
+		// 添加学生
+		addStudent() {
+			addStudent(this.form).then(res => {
+				this.dialogVisible = false;
+				this.$message.success(res.msg);
+				this.getList();
+			});
+		},
+		// 获取表格数据
+		getList() {
+			this.loading = true;
 			listStudent().then(res => {
-				
-			})
+				_.each(res.result, function(item, key) {
+					item.sex === true ? (item.sex = '男') : (item.sex = '女');
+					item.birth = moment().format('YYYY-MM-DD');
+				});
+				this.tableData = res.result;
+				this.loading = false;
+			});
 		},
 		// 拦截关闭弹窗事件
 		handleClose(done) {
@@ -128,30 +138,28 @@ export default {
 		// 编辑
 		handleEdit() {
 			this.dialogTitle = '編集';
-			this.dialogVisible = true;
+			// this.dialogVisible = true;
 		},
 		// 查看
 		handleCheck() {
 			this.dialogTitle = '表示';
-			this.dialogVisible = true;
+			// this.dialogVisible = true;
 		},
 		// 删除
-		handleDelete() {
+		handleDelete(row) {
 			this.$confirm('この操作はデータを完全に削除します。続行しますか?', 'ヒント', {
 				confirmButtonText: 'を選択します',
 				cancelButtonText: 'キャンセル',
 				type: 'warning'
 			})
+				.then(function() {
+					return delStudent(row._id);
+				})
 				.then(() => {
+					this.getList();
 					this.$message({
 						type: 'success',
 						message: '削除に成功しました!'
-					});
-				})
-				.catch(() => {
-					this.$message({
-						type: 'info',
-						message: '削除しました'
 					});
 				});
 		},
