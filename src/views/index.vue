@@ -79,7 +79,7 @@
 		</div>
 		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="25%" :before-close="handleClose" :close-on-click-modal="false" :close-on-press-escape="false">
 			<el-form ref="form" :model="form" :rules="rules" label-width="100px">
-				<el-form-item label="名前" prop="name"><el-input v-if="!form.name" v-model="form.name" placeholder="名前を書いてください" class="form-item"></el-input></el-form-item>
+				<el-form-item label="名前" prop="name"><el-input v-model="form.name" placeholder="名前を書いてください" class="form-item"></el-input></el-form-item>
 				<el-form-item label="性別" prop="sex">
 					<el-select v-model="form.sex" :clearable="true" placeholder="性別を選択してください" class="form-item">
 						<el-option label="男" :value="true"></el-option>
@@ -324,13 +324,21 @@ export default {
 					if (this.form._id != undefined) {
 						updateStudent(this.form).then(res => {
 							this.dialogVisible = false;
-							this.$message.success(res.msg);
+							this.$message.success({
+								showClose: true,
+								duration: 2000,
+								message: res.msg
+							});
 							this.getList();
 						});
 					} else {
 						addStudent(this.form).then(res => {
 							this.dialogVisible = false;
-							this.$message.success(res.msg);
+							this.$message.success({
+								showClose: true,
+								duration: 2000,
+								message: res.msg
+							});
 							this.getList();
 						});
 					}
@@ -351,6 +359,8 @@ export default {
 					this.getList();
 					this.$message({
 						type: 'success',
+						showClose: true,
+						duration: 2000,
 						message: '削除に成功しました!'
 					});
 				});
