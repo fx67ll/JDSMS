@@ -27,9 +27,9 @@ export function addStudent(data) {
 }
 
 // 修改学员
-export function updateStudent(id, data) {
+export function updateStudent(data) {
 	return request({
-		url: '/student/updateStudentById/' + id,
+		url: '/student/updateStudentById/' + data._id,
 		method: 'put',
 		data: data
 	})
