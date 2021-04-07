@@ -16,6 +16,23 @@ Vue.use(ElementUI, {
 	locale
 })
 
+// 统一成功弹窗
+Vue.prototype.msgOK = function(msg) {
+	this.$message.success({
+		showClose: true,
+		duration: 2000,
+		message: msg
+	});
+}
+// 统一错误弹窗
+Vue.prototype.msgError = function(msg) {
+	this.$message.error({
+		showClose: true,
+		duration: 2000,
+		message: msg
+	});
+}
+
 new Vue({
 	router,
 	store,
