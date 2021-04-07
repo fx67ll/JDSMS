@@ -3,7 +3,7 @@
 		<div class="jdsms-right-btnbox">
 			<el-select v-model="dateType" placeholder="検索方法を選択してください" class="jdsms-right-btn-select" @change="dateTypeChange()">
 				<el-option label="月ごとに調べる" :value="0"></el-option>
-				<el-option label="日割りで調べる" :value="1"></el-option>
+				<el-option label="日ごとに調べる" :value="1"></el-option>
 				<el-option label="カスタム" :value="2"></el-option>
 			</el-select>
 			<el-date-picker
@@ -38,7 +38,7 @@
 				class="jdsms-right-btn-date"
 				@change="timeChange()"
 			></el-date-picker>
-			<el-button type="primary" icon="el-icon-search" class="jdsms-right-btn-search" @click="handleSearch">満18歳の人を調べます</el-button>
+			<el-button type="primary" icon="el-icon-search" class="jdsms-right-btn-search" @click="handleSearch">満18歳の該当者を検索</el-button>
 			<el-button type="primary" class="jdsms-right-btn-add" @click="handleAdd">
 				追加
 				<i class="el-icon-upload el-icon--right"></i>
@@ -46,7 +46,7 @@
 		</div>
 		<div class="jdsms-right-table">
 			<el-table :data="tableData" style="width: 100%" :max-height="tableHeight" v-loading="loading">
-				<el-table-column type="index" label="番号付け" width="180"></el-table-column>
+				<el-table-column type="index" label="番号" width="180"></el-table-column>
 				<el-table-column prop="name" label="名前"></el-table-column>
 				<el-table-column label="性別">
 					<template slot-scope="scope">
@@ -54,10 +54,10 @@
 						<span v-show="scope.row.sex === false">女</span>
 					</template>
 				</el-table-column>
-				<el-table-column prop="birth" label="誕生日"></el-table-column>
-				<el-table-column prop="phone" label="電話"></el-table-column>
-				<el-table-column prop="bro" label="関連学生"></el-table-column>
-				<el-table-column prop="createTime" label="データ作成日付"></el-table-column>
+				<el-table-column prop="birth" label="生年月日"></el-table-column>
+				<el-table-column prop="phone" label="連絡先"></el-table-column>
+				<el-table-column prop="bro" label="親族"></el-table-column>
+				<el-table-column prop="createTime" label="データ作成日"></el-table-column>
 				<el-table-column fixed="right" label="操作" width="180">
 					<template slot-scope="scope">
 						<el-button @click.native.prevent="handleEdit(scope.row)" type="text" size="small">編集</el-button>
@@ -86,15 +86,15 @@
 						<el-option label="女" :value="false"></el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="誕生日" prop="birth">
+				<el-form-item label="生年月日" prop="birth">
 					<el-date-picker v-model="form.birth" value-format="yyyy-MM-dd" type="date" placeholder="日付を選択してください" class="form-item"></el-date-picker>
 				</el-form-item>
-				<el-form-item label="電話" prop="phone"><el-input v-model="form.phone" placeholder="電話に記入してください" class="form-item"></el-input></el-form-item>
-				<el-form-item label="関連学生" prop="bro"><el-input v-model="form.bro" placeholder="関連学生を記入してください。" class="form-item"></el-input></el-form-item>
+				<el-form-item label="連絡先" prop="phone"><el-input v-model="form.phone" placeholder="電話に記入してください" class="form-item"></el-input></el-form-item>
+				<el-form-item label="親族" prop="bro"><el-input v-model="form.bro" placeholder="関連学生を記入してください。" class="form-item"></el-input></el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button @click="dialogVisible = false">キャンセル</el-button>
-				<el-button type="primary" @click="submitForm()">を選択します</el-button>
+				<el-button @click="handleCancel()">キャンセル</el-button>
+				<el-button type="primary" @click="submitForm()">選択</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -119,11 +119,11 @@ export default {
 			},
 			// 表单校验
 			rules: {
-				name: [{ required: true, message: '名前は空ではいけません', trigger: 'blur' }],
-				sex: [{ required: true, message: '性別は空ではいけません', trigger: 'blur' }],
-				birth: [{ required: true, message: '誕生日は空いてはいけません', trigger: 'blur' }],
-				phone: [{ required: true, message: '電話は空ではいけません', trigger: 'blur' }],
-				bro: [{ required: true, message: '関連学生は空にしてはいけません', trigger: 'blur' }]
+				name: [{ required: true, message: '名前を入れてください', trigger: 'blur' }],
+				sex: [{ required: true, message: '性別を入れてください', trigger: 'blur' }],
+				birth: [{ required: true, message: '生年月日は空いてはいけません', trigger: 'blur' }],
+				phone: [{ required: true, message: '連絡先を入れてください', trigger: 'blur' }],
+				bro: [{ required: true, message: '親族を入れてください', trigger: 'blur' }]
 			},
 			// 查询类型
 			dateType: 0,
@@ -289,8 +289,8 @@ export default {
 		// 新增
 		handleAdd() {
 			this.dialogTitle = '追加';
-			this.dialogVisible = true;
 			this.clearForm();
+			this.dialogVisible = true;
 		},
 		// 编辑
 		handleEdit(row) {
@@ -305,17 +305,22 @@ export default {
 		},
 		// 清空表单
 		clearForm() {
-			this.form = {
-				_id: null,
-				name: null,
-				sex: null,
-				birth: null,
-				phone: null,
-				bro: null
-			};
 			this.$nextTick(() => {
+				this.form = {
+					_id: null,
+					name: null,
+					sex: null,
+					birth: null,
+					phone: null,
+					bro: null
+				};
 				this.$refs.form.resetFields();
 			});
+		},
+		// 取消按钮
+		handleCancel() {
+			this.clearForm();
+			this.dialogVisible = false;
 		},
 		// 提交表单
 		submitForm() {
@@ -323,22 +328,16 @@ export default {
 				if (valid) {
 					if (this.form._id != undefined) {
 						updateStudent(this.form).then(res => {
+							this.clearForm();
 							this.dialogVisible = false;
-							this.$message.success({
-								showClose: true,
-								duration: 2000,
-								message: res.msg
-							});
+							this.msgOK(res.msg);
 							this.getList();
 						});
 					} else {
 						addStudent(this.form).then(res => {
+							this.clearForm();
 							this.dialogVisible = false;
-							this.$message.success({
-								showClose: true,
-								duration: 2000,
-								message: res.msg
-							});
+							this.msgOK(res.msg);
 							this.getList();
 						});
 					}
@@ -357,12 +356,7 @@ export default {
 				})
 				.then(() => {
 					this.getList();
-					this.$message({
-						type: 'success',
-						showClose: true,
-						duration: 2000,
-						message: '削除に成功しました!'
-					});
+					this.msgOK('削除に成功しました!');
 				});
 		},
 		// 表格数据初始化
