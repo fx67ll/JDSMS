@@ -96,9 +96,10 @@ service.interceptors.response.use(res => {
 			message = "系统接口" + message.substr(message.length - 3) + "异常";
 		}
 		Message({
-			message: message,
 			type: 'error',
-			duration: 5 * 1000
+			showClose: true,
+			duration: 2000,
+			message: message
 		})
 		return Promise.reject(error)
 	}
